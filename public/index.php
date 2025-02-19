@@ -1,26 +1,14 @@
 <?php
 
-define('RESTRICTED', TRUE);
-define('ROOT', dirname(__FILE__));
+define('RESTRICTED', true);
 
-require_once '../app/core/class.autoload.php';
-require_once '../config/configuration.php';
-require_once '../config/appSettings.php';
+/* Load Leantime helper functions before laravel */
+require __DIR__.'/../app/helpers.php';
 
+require __DIR__.'/../vendor/autoload.php';
 
-$config = \leantime\core\environment::getInstance();
-$settings = new leantime\core\appSettings();
-$settings->loadSettings($config->defaultTimezone, $config->debug ?? 0);
+// Get the application once.
+// Loads everything up once and then let's the bootloader manage it
+$app = require_once __DIR__.'/../bootstrap/app.php';
 
-if(isset($config->appUrl) && $config->appUrl != ""){
-    define('BASE_URL', $config->appUrl);
-    define('CURRENT_URL', $config->appUrl.$settings->getRequestURI($config->appUrl));
-} else{
-    define('BASE_URL', $settings->getBaseURL());
-    define('CURRENT_URL', $settings->getFullURL());
-}
-
-//Bootstrap application
-$application = new leantime\core\application();
-
-$application->start();
+\Leantime\Core\Bootloader::getInstance()->boot($app);
